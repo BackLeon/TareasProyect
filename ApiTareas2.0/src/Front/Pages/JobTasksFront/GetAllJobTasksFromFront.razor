@@ -1,0 +1,163 @@
+﻿@page "/Get-All-Job-Task-Admin-Permision19-99"
+@inject HttpClient http
+@using Newtonsoft.Json
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="card border-0" style="box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important;">
+    <div class="card-header">
+        <h5 class="card-title">
+            <strong>LISTA DE TAREAS</strong>
+        </h5>
+        <h6 class="card-subtitle text-muted">
+            Listado de tareas pendientes y completadas.
+        </h6>
+
+        
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Codigo Unico</th>
+                    <th>Fecha de creacion</th>
+                    <th>Nombre</th>
+                    <th>Area</th>
+                    <th>Nombre</th>
+                    <th>Estatus</th>
+                    <th>Ver</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+                <AuthorizeView>
+                    @{
+                        if (@rolUSuarioConectado.Equals("ADMIN"))
+                        {                 
+                                @foreach(var tarea in Tareas)
+                                {
+                                    <tr>
+                                        <td>@tarea.Radicado</td>
+                                        <td>@tarea.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                        <td>@tarea.Name</td>
+                                        <td>@tarea.AppUserArea</td>
+                                        <td>@tarea.AppUserName @tarea.AppUserLastName</td>
+                                        @if(tarea.Status == false)
+                                        {
+                                            <td><span class="badge text-bg-danger" style="background-color: firebrick">Pendiente</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span class="badge text-bg-success" style="background-color: #289e68">Completada</span></td>
+                                        }
+                                        <td>
+                                            <NavLink href=@($"/ver-post-19-99-for-1/{@tarea.Id}") class="btn btn-info" style="color:white;background-color: #0d6efd;">
+                                                Ver
+                                            </NavLink>
+                            
+                                        </td>
+                                    </tr>
+                                }
+                        }                       
+                        else
+                        {
+                            @foreach (var tarea in Tareas)
+                            {
+                                if (tarea.AppUserId == parseadoId)
+                                {
+                                    <tr>
+                                        <td>@tarea.Radicado</td>
+                                        <td>@tarea.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                        <td>@tarea.Name</td>
+                                        <td>@tarea.AppUserArea</td>
+                                        <td>@tarea.AppUserName @tarea.AppUserLastName</td>
+                                        @if (tarea.Status == false)
+                                        {
+                                            <td><span class="badge text-bg-danger" style="background-color: firebrick">Pendiente</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span class="badge text-bg-success" style="background-color: #289e68">Completada</span></td>
+                                        }
+                                        <td>
+                                            <NavLink href=@($"/ver-post-19-99-for-1/{@tarea.Id}") class="btn btn-info" style="color:white;background-color: #0d6efd;">
+                                                Ver
+                                            </NavLink>
+
+                                        </td>
+                                    </tr>
+                                }
+                                
+                            }
+
+                        }
+                    
+                                        
+                                            
+                                            
+                  
+                }
+                </AuthorizeView>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+
+@code {
+    public IEnumerable<JobTaskToListOnlyNameDto> Tareas { get; set; } = new List<JobTaskToListOnlyNameDto>();
+
+    public string rolUSuarioConectado { get; set; }
+    public string userId { get; set; }
+
+    public int parseadoId { get; set; } 
+
+    IEnumerable<JobTaskToListOnlyNameDto> _filtrarTareas = new List<JobTaskToListOnlyNameDto>();
+    private async Task<IEnumerable<JobTaskToListOnlyNameDto>> GetAllJobTaskFront()
+    {
+        var contents = await http.GetAsync($"{Inicializar.UrlBaseApi}api/JobTask/GetAllJobTask");
+        var read = await contents.Content.ReadAsStringAsync();
+        var resultado = JsonConvert.DeserializeObject<IEnumerable<JobTaskToListOnlyNameDto>>(read);
+
+        return resultado!;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tareas = await GetAllJobTaskFront();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userRoleString = user.FindFirst(c => c.Type == ClaimTypes.Role)?.Value;
+        var userIdString = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        rolUSuarioConectado = userRoleString!;
+        userId = userIdString;
+        parseo();
+
+        // _filtrarTareas = Tareas.ToList();
+    }
+
+    private async Task parseo()
+    {
+        parseadoId = Int32.Parse(userId);
+    }
+
+    // void tareasupdate(string searchTerm)
+    // {
+    //     if(string.IsNullOrEmpty(searchTerm))
+    //     {
+    //         _filtrarTareas = Tareas
+    //     }
+    //     else
+    //     {
+    //         _filtrarTareas = Tareas.Where(
+    //             JobTaskToListOnlyNameDto => JobTaskToListOnlyNameDto.Radicado.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+    //         ).ToList();
+    //     }
+    // }
+
+}

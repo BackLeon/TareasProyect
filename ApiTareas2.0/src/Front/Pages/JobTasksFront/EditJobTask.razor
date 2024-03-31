@@ -1,0 +1,164 @@
+﻿@inject HttpClient http
+@using Newtonsoft.Json
+@using System.Text
+@inject IToastService toastService
+
+@page "/Edit-JobTask/{Id:int}"
+
+
+<EditForm Model="editarTarea" OnValidSubmit="ManejadorOnEditarPost" class="pt-4">
+    <DataAnnotationsValidator />
+    <div class="py-4">
+        <div class=" row form-group ">
+            <div class="col-6 offset-3 ">
+                <div class="card border">
+                    <div class="card-body px-lg-5 pt-4">
+                        <h3 class="col-12 text-success text-center py-2">
+                            <strong>Actualizar tarea</strong>
+                        </h3>
+                        @{
+                            if (MostrarErroresRegistro1)
+                            {
+                                toastService.ShowSuccess(Errores!);
+                                toastService.ShowSuccess("Por favor espera, seras redireccionado hacia la tarea...");
+                                MostrarErroresRegistro1 = false;
+                                redirectToOtherPage = true;
+                                Redireccionar();
+                                
+                                
+                            }
+                            else if (MostrarErroresRegistro2)
+                            {
+                                toastService.ShowError(Errores!);
+                                MostrarErroresRegistro2 = false;
+                            }
+
+                        }
+
+                        <hr style="background-color:aliceblue" />
+                        <div class="py-2">
+                            <label for="exampleFormControlInput1" class="form-label">Tarea</label>
+                            <InputText @bind-Value="editarTarea.Name" class="form-control" placeholder="Nombre de la tarea">@editarTarea.Name </InputText>
+                            <ValidationMessage For="(()=>editarTarea.Name)" />
+
+                        </div>
+                        <div class="py-2">
+                            <label for="exampleFormControlInput1" class="form-label">Descripción</label>
+                            <InputTextArea @bind-Value="editarTarea.Description" class="form-control" placeholder="Descripción de la tarea">@editarTarea.Description </InputTextArea>
+                            <ValidationMessage For="(()=>editarTarea.Description)" />
+                        </div>
+                        <div class="py-2">
+                            <label for="exampleFormControlInput1" class="form-label">Usuario responsable</label>
+                            @* <InputSelect @bind-Value="nuevaTarea.AppUserId" class="form-control" placeholder="Descripción de la tarea" /> *@
+                            <select @bind="editarTarea.AppUserId" class="form-control">
+
+                                    <option value="@editarTarea.AppUserId">@datosListos.AppUserEmail</option>
+                                @foreach (var usuario in Usuarios)
+                                {
+                                    <option value="@usuario.Id">@usuario.Email</option>
+                                }
+                            </select>
+                            <ValidationMessage For="(()=>editarTarea.AppUserId)" />
+                        </div>
+                        <hr style="background-color:aliceblue" />
+                        <div class="py-2">
+                            <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sign-in-alt"></i>Actualizar Tarea</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Inject]
+    public NavigationManager? navigationManager { get; set; }
+
+    private JobTaskToEditDto editarTarea { get; set; } = new()
+    {
+        Name = datosListos.Name,
+        Description = datosListos.Description,
+        AppUserId = datosListos.AppUserId
+
+    };
+    private bool redirectToOtherPage = false;
+    public bool MostrarErroresRegistro1 = false;
+    public bool MostrarErroresRegistro2 = false;
+    public string Errores { get; set; }
+
+    private static JobTaskToListDto datosListos { get; set; } = new();
+
+    public IEnumerable<AppUserOnlyIdAndEmail> Usuarios { get; set; } = new List<AppUserOnlyIdAndEmail>();
+
+    private async Task<IEnumerable<AppUserOnlyIdAndEmail>> GetAllUserToShowAndSelect()
+    {
+        var contents = await http.GetAsync($"{Inicializar.UrlBaseApi}api/AppUser/GetAllUsers");
+        var read = await contents.Content.ReadAsStringAsync();
+        var resultado = JsonConvert.DeserializeObject<IEnumerable<AppUserOnlyIdAndEmail>>(read);
+
+        return resultado!;
+    }
+
+    private async Task<string> UpdateJobtaskFinalFront(int id, JobTaskToEditDto jobTaskEdit)
+    {
+        var content = JsonConvert.SerializeObject(jobTaskEdit);
+        var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+        var response = await http.PutAsync($"{Inicializar.UrlBaseApi}api/JobTask/Update-JobTask/{id}", bodyContent);
+        if(response.IsSuccessStatusCode)
+        {
+            return "Se actualizo con exito la tarea";
+        }
+        else
+        {
+            return "No se pudo actualizar la tarea";
+        }
+    }
+
+    private async Task ManejadorOnEditarPost()
+    {
+        var resultado = await UpdateJobtaskFinalFront(Id, editarTarea);
+        if (resultado.Equals("Se actualizo con exito la tarea"))
+        {
+
+            MostrarErroresRegistro1 = true;
+            Errores = "Se actualizo con exito la tarea";
+        }
+        else
+        {
+            MostrarErroresRegistro2 = true;
+            Errores = "No se pudo actualizar la tarea";
+        }
+
+    }
+
+    private async Task<JobTaskToListDto> GetOnlyOneJobTask(int id)
+    {
+        var response = await http.GetAsync($"{Inicializar.UrlBaseApi}api/JobTask/GetJobTask/{id}");
+        var content = await response.Content.ReadAsStringAsync();
+        var job = JsonConvert.DeserializeObject<JobTaskToListDto>(content);
+
+        return job!;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        datosListos = await GetOnlyOneJobTask(Id);
+        Usuarios = await GetAllUserToShowAndSelect();
+    }
+
+    private async Task Redireccionar()
+    {
+        if (redirectToOtherPage)
+        {
+            await Task.Delay(5000);
+
+            navigationManager.NavigateTo($"/ver-post-19-99-for-1/{Id}");
+        }
+    }
+}

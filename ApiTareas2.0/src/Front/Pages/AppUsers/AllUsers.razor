@@ -1,0 +1,131 @@
+﻿@inject HttpClient http
+@using Newtonsoft.Json
+@page "/AllUsers-For-Search"
+
+
+<div class="card border-0" style="box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important;">
+    <div class="card-header">
+        <h5 class="card-title">
+            <strong>LISTA DE USUARIOS</strong>
+        </h5>
+        <h6 class="card-subtitle text-muted">
+            Selecciona un AREA DE TRABAJO para filtrar los usuarios}
+            <thead>
+                <tr>
+            @foreach (var area in areasDeTrabajo)
+            {
+                
+                    <th>
+                       <button  @onclick="async () => await ChangeIdArea(area.Id)"><strong>@area.Name</strong></button>
+                    </th>
+            }
+                </tr>
+
+            </thead>
+        </h6>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Cedula</th>
+                    <th>Area de trabajo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    if (areaIdUnica == 0)
+                    {
+                        foreach (var usuario in usuariosFront)
+                        {
+                            <tr>
+                                <td>@usuario.Id</td>
+                                <td>@usuario.Name @usuario.LastName</td>
+                                <td>@usuario.Email</td>
+                                <td>@usuario.License</td>
+                                <td>@usuario.JobAreaName</td>
+                                <td>
+                                    @* <NavLink href=@($"/ver-post-19-99-for-1/{@tarea.Id}") class="btn btn-info" style="color:white;background-color: #0d6efd;">
+                        Ver
+                        </NavLink> *@
+
+                                </td>
+                            </tr>
+
+                        }
+                    }
+                    else
+                    {
+                        foreach (var usuario in usuariosFront.Where(x => x.JobAreaId == areaIdUnica))
+                        {
+                            <tr>
+                                <td>@usuario.Id</td>
+                                <td>@usuario.Name @usuario.LastName</td>
+                                <td>@usuario.Email</td>
+                                <td>@usuario.License</td>
+                                <td>@usuario.JobAreaName</td>
+                                <td>
+                                    @* <NavLink href=@($"/ver-post-19-99-for-1/{@tarea.Id}") class="btn btn-info" style="color:white;background-color: #0d6efd;">
+                        Ver
+                        </NavLink> *@
+
+                                </td>
+                            </tr>
+
+                        }
+                    }
+
+                }
+                
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+@code {
+
+    public IEnumerable<AppUserForRazorUsuarios> usuariosFront { get; set; } = new List<AppUserForRazorUsuarios>();
+    public IEnumerable<JobAreaToListUsersDto> areasDeTrabajo { get; set; } = new List<JobAreaToListUsersDto>();
+
+    public int areaIdUnica { get; set; } = 0;
+
+
+    private async Task<IEnumerable<JobAreaToListUsersDto>> GetAllJobAreasForFrontInRazor()
+    {
+        var contents = await http.GetAsync($"{Inicializar.UrlBaseApi}api/JobArea/AllJobAreas");
+        var read = await contents.Content.ReadAsStringAsync();
+        var resulta = JsonConvert.DeserializeObject<IEnumerable<JobAreaToListUsersDto>>(read);
+
+        return resulta!;
+    }
+
+    private async Task<IEnumerable<AppUserForRazorUsuarios>> GetAllUsersForFrontInRazor()
+    {
+        var contents = await http.GetAsync($"{Inicializar.UrlBaseApi}api/AppUser/GetAllUsersComplete");
+        var read = await contents.Content.ReadAsStringAsync();
+        var resultado = JsonConvert.DeserializeObject<IEnumerable<AppUserForRazorUsuarios>>(read);
+
+        return resultado!;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuariosFront = await GetAllUsersForFrontInRazor();
+        areasDeTrabajo = await GetAllJobAreasForFrontInRazor();
+    }
+
+    
+
+    private async Task ChangeIdArea(int id)
+    {
+        areaIdUnica = id;
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

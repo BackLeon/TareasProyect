@@ -1,0 +1,284 @@
+﻿@page "/ver-post-19-99-for-1/{Id:int}"
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@inject IToastService toastService
+@inject IJSRuntime JSRuntime
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+@using System.Text
+
+@if (verJobTask.Id == 0)
+{
+    
+}
+else
+{
+    
+
+
+<div class="card border-0" style="box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important;">
+
+    @{
+        if (MostrarErroresRegistro1)
+        {
+            toastService.ShowSuccess(Errores!);
+
+            MostrarErroresRegistro1 = false;
+            redirectToOtherPage = true;
+            Redireccionar();
+        }
+        else if (MostrarErroresRegistro2)
+        {
+            toastService.ShowError(Errores!);
+            MostrarErroresRegistro2 = false;
+        }
+
+    }
+
+
+    
+    <div class="card-header">
+        <h5 class="card-title">
+            <strong>Informacion de usuario</strong>
+        </h5>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>IdUsuario</th>
+                    <th>Area de trabajo</th>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                    <tr>
+                        <td>@verJobTask.AppUserId</td>
+                        <td>@verJobTask.AppUserArea</td>
+                        <td>@verJobTask.AppUserName</td>
+                        <td>@verJobTask.AppUserLastName</td>
+                        <td>@verJobTask.AppUserEmail</td>                       
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+<div class="card text-center" style="box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important; margin-top: 3.5rem !important;">
+    <div class="card-header" style="background-color: #212529;color: white;">  
+        <h5><strong>@verJobTask.Name</strong></h5>
+    </div>
+    
+        <div class="card-body">
+            <h5 class="card-title">@verJobTask.Description</h5>
+            <AuthorizeView Roles="ADMIN">
+                <NavLink href=@($"/Edit-JobTask/{verJobTask.Id}") class="btn btn-primary" style="color:white;background-color: #0d6efd;">
+                    Actualizar
+                </NavLink>
+            <a @onclick="eliminarTareaMetodoBoton" class="btn btn-primary">Borrar</a>
+            </AuthorizeView>
+        </div>
+     
+    
+
+    <a @onclick="actualizarTarea" class="btn btn-primary">Actualizar estatus</a>
+
+
+
+    <div class="card-footer text-body-secondary">
+        <strong>Fecha de creacion</strong> @verJobTask.CreatedAt.ToString("dd/MM/yyyy")  - 
+        @{
+            if (!verJobTask.Status)
+            {
+                <span class="badge text-bg-danger" style="background-color: firebrick">Pendiente</span>
+            }
+            else
+            {
+                    <span class="badge text-bg-success" style="background-color: #289e68">Completada</span>
+                }
+            }
+
+     </div>
+</div>
+    <EditForm Model="crearComentario" OnValidSubmit="ManejadorOnCrearComentario" class="pt-4">
+    <div class="card" style="margin-top: 3.7rem !important; margin-top: 3.5rem !important; box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important; color: #dcd6fb; background-color: #2f2f2f; border-color: #434549;">
+        <div class="card-header">
+            <i class="bi bi-bookmark-check"></i> Prueba
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Nuevo Comentario:</h5>
+                            
+                <InputTextArea @bind-Value="crearComentario.Description" class="form-control" placeholder="Nuevo comentario aqui...." />
+                <ValidationMessage For="(()=>crearComentario.Description)" />
+                <button style="margin-top: 10px;" type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+    </div>
+</EditForm>
+
+
+    @foreach(var comentario in @verJobTask.Comments)
+    {
+        <div class="card" style="margin-top: 3.7rem !important; margin-top: 3.5rem !important; box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important; color: #dcd6fb; background-color: #2f2f2f; border-color: #434549;">
+            <div class="card-header">
+                <i class="bi bi-bookmark-check"></i> @comentario.AppUserName @comentario.AppUserLastName - @comentario.AppUserEmail
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Comentario:</h5>
+                <p class="card-text">@comentario.Description</p>
+                <p class="card-text">@comentario.CreatedAt.ToString("dd/MM/yyyy")</p>
+            </div>
+        </div>
+    }
+
+
+}
+    
+@code {
+
+    public bool MostrarErroresRegistro1 { get; set; } = false;
+    public bool MostrarErroresRegistro2 { get; set; } = false;
+    public string? Errores { get; set; }
+    private bool redirectToOtherPage = false;
+
+    private JobTaskUpdateStatus jobUpdate { get; set; } = new JobTaskUpdateStatus();
+    private JobTaskToListDto verJobTask { get; set; } = new JobTaskToListDto();
+    public bool MostrarErroresActualizar { get; set; } = false;
+
+    // public IEnumerable<CommentsToListDto> Comentarios { get; set; } = new List<CommentsToListDto>();
+
+    public string userId { get; set;  }
+    public CommentToCreateDto crearComentario = new CommentToCreateDto();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [Inject] private NavigationManager navigationManager { get; set; }
+
+    private async Task<bool> CreateComment(int id, CommentToCreateDto comNuevo)
+    {
+        var content = JsonConvert.SerializeObject(comNuevo);
+        var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+        var response = await http.PostAsync($"{Inicializar.UrlBaseApi}api/JobTask/Create-Comment-For-JobTask/{id}", bodyContent);
+        if (response.IsSuccessStatusCode)
+        {
+            var contentTemp = await response.Content.ReadAsStringAsync();
+            var result = (JObject)JsonConvert.DeserializeObject(contentTemp)!;
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private async Task ManejadorOnCrearComentario()
+    {
+        var resultado = await CreateComment(Id, crearComentario);
+
+        navigationManager.NavigateTo($"/ver-post-19-99-for-1/{Id}", true);
+
+    }
+
+
+    private async Task<JobTaskToListDto> GetOnlyOneJobTask(int id)
+    {
+        var response = await http.GetAsync($"{Inicializar.UrlBaseApi}api/JobTask/GetJobTask/{id}");
+        var content = await response.Content.ReadAsStringAsync();
+        var job = JsonConvert.DeserializeObject<JobTaskToListDto>(content);
+
+        return job!;
+    }
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        verJobTask = await GetOnlyOneJobTask(Id);
+        // Comentarios = await GetAllCommentsFront(Id);
+
+        var userIdString = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        crearComentario.AppUserId = userIdString;
+        
+    }
+
+    private async Task<string> actualizaestado(int id, JobTaskUpdateStatus status)
+    {
+        var content = JsonConvert.SerializeObject(status);
+        var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+        var response = await http.PutAsync($"{Inicializar.UrlBaseApi}api/JobTask/Update-Status-JobTask/{id}", bodyContent);
+        var contentTemp = await response.Content.ReadAsStringAsync();
+        var final = contentTemp!.ToString();
+
+        return final;
+    }
+
+    private async Task actualizarTarea()
+    {      
+        var result = await actualizaestado(Id, jobUpdate);
+        if (result.Equals("La tarea ha sido completada"))
+        {
+            navigationManager.NavigateTo($"/ver-post-19-99-for-1/{Id}", true);
+        }
+
+        if (result.Equals("La tarea esta pendiente"))
+        {
+            navigationManager.NavigateTo($"/ver-post-19-99-for-1/{Id}", true);
+        }
+    }
+
+    private async Task<string> eliminarTarea(int id)
+    {
+        var content = JsonConvert.SerializeObject(id);
+        var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+        var response = await http.DeleteAsync($"{Inicializar.UrlBaseApi}api/JobTask/Delete-JobTask/{id}");
+
+        if(response.IsSuccessStatusCode)
+        {
+            return "Se elimino con exito la tarea, seras redireccionado";
+        }
+
+        return "No se pudo eliminar la tarea";
+    }
+
+    private async Task eliminarTareaMetodoBoton()
+    {
+        var result = await eliminarTarea(Id);
+        if (result.Equals("Se elimino con exito la tarea, seras redireccionado"))
+        {
+            Errores = result;
+            MostrarErroresRegistro1 = true;
+            navigationManager.NavigateTo($"/ver-post-19-99-for-1/{Id}", true);
+        }
+
+        if (result.Equals("No se pudo eliminar la tarea"))
+        {
+            Errores = result;
+            MostrarErroresRegistro2 = true;
+            navigationManager.NavigateTo($"/ver-post-19-99-for-1/{Id}", true);
+        }
+    }
+
+    private async Task Redireccionar()
+    {
+        if (redirectToOtherPage)
+        {
+            await Task.Delay(5000);
+
+            navigationManager.NavigateTo($"/Get-All-Job-Task-Admin-Permision19-99");
+        }
+    }
+
+}

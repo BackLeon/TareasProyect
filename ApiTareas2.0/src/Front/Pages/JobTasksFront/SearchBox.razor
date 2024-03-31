@@ -1,0 +1,23 @@
+﻿@typeparam TEntity
+
+<input placeholder="buscar..." @bind="searchItem"/>
+
+<button @onclick=OnSearchClic>
+    Buscar
+</button>
+
+
+@code {
+    [Parameter]
+    public List<TEntity> items { get; set;  }
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    private string searchItem;
+
+    private async Task OnSearchClic()
+    {
+        await OnSearch.InvokeAsync(searchItem);
+    }
+}

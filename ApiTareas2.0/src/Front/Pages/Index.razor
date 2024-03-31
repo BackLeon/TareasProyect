@@ -1,0 +1,159 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@inject IToastService toastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+
+<PageTitle>Index</PageTitle>
+
+
+
+
+<AuthorizeView>
+    <Authorized>
+<div class="row">
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card flex-fill border-0 illustration ">
+            <div class="card-body p-0 d-flex flex-fill" style="box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important;">
+                <div class="row g-0 w-100">
+                    <div class="col-6">
+                        <div class="p-3 m-1">
+                                    <h4>Bienvenido de nuevo, <strong>@context.User.Identity.Name</strong> </h4>
+                            <p class="mb-0">Administrador de tareas</p>
+                        </div>
+                            </div>
+                                <div class="col-6 align-self-end text-end">
+                                    <img src="imgportal/Man-JobTask.jpg" class="img-fluid illustration-img" alt="">
+                                </div>
+                            </div>
+                        </div>
+                            </div>
+                        </div>
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card flex-fill border-0 illustration ">
+            <div class="card-body p-0 d-flex flex-fill" style="box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important;">
+                <div class="row g-0 w-100">
+                    <div class="col-6">
+                        <div class="p-3 m-1">
+                            <h4>Bienvenido de nuevo, @context.User.Identity.Name</h4>
+                                    <p class="mb-0">Realizar las <strong>tareas asignadas</strong> es un papel muy importante para nosotros.</p>
+                        </div>
+                            </div>
+                       <div class="col-6 align-self-end text-end">
+                            <img src="imgportal/woman-JobTask.jpg" class="img-fluid illustration-img" alt="">
+                    </div>
+               </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </Authorized>
+    <NotAuthorized>
+        <h3>No estas autorizado</h3>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+<AuthorizeView Roles="ADMIN">
+    
+<div class="alert alert-secondary mt-4" style="margin-top: 3.5rem !important; box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important; color: #dcd6fb; background-color: #2f2f2f; border-color: #434549;">
+    
+    <span class="oi oi-pencil me-2" aria-hidden="true"></span>
+    <strong>¡SOY ADMINISTRADOR!</strong>
+    <span class="text-nowrap">
+        Como administrador crear, eliminar, leer, actualizar y asignar tareas.     
+    </span>
+</div>
+</AuthorizeView>
+<div class="card" style="margin-top: 3.7rem !important; margin-top: 3.5rem !important; box-shadow: 0 .5rem 1rem rgba(0,0,0,0.55)!important; color: #dcd6fb; background-color: #2f2f2f; border-color: #434549;">
+  <div class="card-header">
+    <i class="bi bi-bookmark-check"></i> Informacion personal
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Confirmar mis datos</h5>
+    <p class="card-text">¿Algo no anda bien con mis datos personales?, ¡deberia hacer unos cambios en ellos!</p>
+    <a href="#" class="btn btn-primary">Ir a mis datos personales</a>
+  </div>
+</div>
+
+<div class="row" style="margin-top: 3.5rem !important;">
+    
+  <div class="col-sm-6 mb-3 mb-sm-0">
+    <div class="card">
+      <div class="card-body">
+                <div class="card-header">
+                    <i class="bi bi-bookmark-check"></i> Informacion personal
+                </div>
+        <h5 class="card-title"> ¡Tareas Completadas!</h5>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Tareas Pendientes</h5>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+  </div>
+</div>
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<button type="button" class="btn btn-primary" id="liveToastBtn">Show live toast</button>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <img src="..." class="rounded me-2" alt="...">
+            <strong class="me-auto">Bootstrap</strong>
+            <small>11 mins ago</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Hello, world! This is a toast message.
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-info" @onclick="@(()=> toastService.ShowInfo("Welcome"))">Info Toast</button>
+<button class="btn btn-success" @onclick="@(()=> toastService.ShowSuccess("Welcome"))">Info Toast</button>
+<button class="btn btn-warning" @onclick="@(()=> toastService.ShowWarning("Welcome"))">Info Toast</button>
+<button class="btn btn-danger" @onclick="@(()=> toastService.ShowError("Welcome"))">Info Toast</button>
+
+
+@code
+{
+    public string? userEmail { get; set; }
+
+    protected async Task<string> GetEmail()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var emailClaim = user.FindFirst("Email");
+        userEmail = emailClaim?.Value ?? "Correo electrónico no encontrado";
+        return userEmail;
+    }
+    
+    [CascadingParameter]
+    protected Task<AuthenticationState>? AuthState { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthState!).User;
+
+        if (!user!.Identity!.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/acceder", true);
+        }
+    }
+    
+
+
+
+}

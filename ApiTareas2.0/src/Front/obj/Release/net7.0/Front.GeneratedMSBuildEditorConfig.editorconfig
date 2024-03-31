@@ -1,0 +1,89 @@
+is_global = true
+build_property.TargetFramework = net7.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = browser
+build_property.RootNamespace = Front
+build_property.RootNamespace = Front
+build_property.ProjectDir = C:\Users\angel\Desktop\NetEstudios\ApiTareas2.0\src\Front\
+build_property.RazorLangVersion = 7.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\angel\Desktop\NetEstudios\ApiTareas2.0\src\Front
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/AppUsers/AllUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwVXNlcnNcQWxsVXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/autenticacion/Acceder.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcYXV0ZW50aWNhY2lvblxBY2NlZGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/autenticacion/Registro.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcYXV0ZW50aWNhY2lvblxSZWdpc3Ryby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/autenticacion/Salir.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcYXV0ZW50aWNhY2lvblxTYWxpci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/Counter.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/FetchData.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRmV0Y2hEYXRhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/JobTasksFront/CreateJobTask.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iVGFza3NGcm9udFxDcmVhdGVKb2JUYXNrLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/JobTasksFront/EditJobTask.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iVGFza3NGcm9udFxFZGl0Sm9iVGFzay5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/JobTasksFront/GetAllJobTasksFromFront.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iVGFza3NGcm9udFxHZXRBbGxKb2JUYXNrc0Zyb21Gcm9udC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/JobTasksFront/GetJobTaskOne.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iVGFza3NGcm9udFxHZXRKb2JUYXNrT25lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/JobTasksFront/SearchBox.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iVGFza3NGcm9udFxTZWFyY2hCb3gucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Pages/RedireccionarAlAcceso.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVkaXJlY2Npb25hckFsQWNjZXNvLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-6ucp172b76
+
+[C:/Users/angel/Desktop/NetEstudios/ApiTareas2.0/src/Front/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-phtkuz9dxj

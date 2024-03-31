@@ -1,0 +1,57 @@
+﻿@inherits LayoutComponentBase
+@using Blazored.Toast.Configuration
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+
+@attribute [Authorize]
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main style="background-color: #e7e8eb; width: 50%; ">
+        <div class="top-row px-4">
+
+            <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+                <AuthorizeView>
+                    <Authorized>
+                        <strong style="color: white; display: grid; align-items: center; font-size:large">@context.User.Identity.Name</strong>
+                        
+                        <NavLink href="salir">
+                            <button type="button" class="btn btn-light">Salir de sesion</button>
+                        </NavLink>
+                    </Authorized>
+                    <NotAuthorized>
+                        <NavLink href="registrarse">
+                            <button type="button" class="btn btn-light">Registrarse</button>
+                        </NavLink>
+                               
+                        <NavLink href="acceder">
+                            <button type="button" class="btn btn-light">Iniciar sesion</button>
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+
+            </div>
+
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+
+
+<BlazoredToasts Position="ToastPosition.BottomRight"
+    Timeout="4"
+    IconType="IconType.FontAwesome"
+    ErrorIcon="fa fa-bug"
+    InfoIcon="school"
+    SuccessIcon="fa fa-thumbs-up"
+     WarningIcon="warning"
+     ShowProgressBar="@true"/>
+
+
+

@@ -1,0 +1,186 @@
+﻿@page "/registrarse"
+@inject IToastService toastService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using Core.Dtos
+
+<EditForm Model="UsuarioParaRegistro" OnValidSubmit="RegistrarUsuario" class="pt-4">
+    <DataAnnotationsValidator />
+    <div class="py-4">
+        <div class=" row form-group ">
+            <div class="col-6 offset-3 ">
+                <div class="card border">
+                    <div class="card-body px-lg-5 pt-4">
+                        <h3 class="col-12 text-success text-center py-2">
+                            <strong>Registrarse</strong>
+                        </h3>
+
+                        @{
+                            if (MostrarErroresRegistro)
+                            {
+                                toastService.ShowError(Errores!);
+                                MostrarErroresRegistro = false;
+                            }
+                                                 
+                        }
+
+                        <hr style="background-color:aliceblue" />
+                        <div class="py-2">
+                            <InputText @bind-Value="UsuarioParaRegistro.Name" class="form-control" placeholder="Nombre..." />
+                            <ValidationMessage For="(()=>UsuarioParaRegistro.Name)" />
+
+                        </div>
+                        <div class="py-2">
+                            <InputText @bind-Value="UsuarioParaRegistro.LastName" class="form-control" placeholder="Apellidos..." />
+                            <ValidationMessage For="(()=>UsuarioParaRegistro.LastName)" />
+
+                        </div>
+                        <div class="py-2">
+                            <InputText @bind-Value="UsuarioParaRegistro.Phone" class="form-control" type="number" placeholder="Celular..." />
+                            <ValidationMessage For="(()=>UsuarioParaRegistro.Phone)" />
+
+                        </div>
+                        <div class="py-2">
+                            <InputText @bind-Value="UsuarioParaRegistro.Email" class="form-control" placeholder="Email..." />
+                            <ValidationMessage For="(()=>UsuarioParaRegistro.Email)" />
+
+                        </div>
+                        <div class="py-2 input-group">
+                            <InputText @bind-Value="UsuarioParaRegistro.License" class="form-control" type="number" placeholder="licencia" />
+                            <ValidationMessage For="(()=>UsuarioParaRegistro.License)" />
+
+                        </div>
+                        <div class="form-row py-2">
+                            <div class="col">
+                                <InputText @bind-Value="UsuarioParaRegistro.Password" type="password" id="password" placeholder="Password..." class="form-control" />
+                                <ValidationMessage For="(()=>UsuarioParaRegistro.Password)" />
+                            </div>
+
+                        </div>
+                        <hr style="background-color:aliceblue" />
+                        <div class="py-2">
+                            @if(EstaProcesando)
+                            {
+                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sign-in-alt"></i> Procesando..</button>
+                            }else
+                            {
+                                <button type="submit" class="btn btn-success btn-block"><i class="fas fa-sign-in-alt"></i> Registrarse</button>
+                            }
+                            
+  
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</EditForm>
+
+@code
+{
+    // [Inject]
+    // public NavigationManager? navigationManager { get; set; }
+    // AppUserToRegisterDto usuarioNewRegistro = new AppUserToRegisterDto();
+
+    // public bool EstaProcesando { get; set; } = false;
+    // public bool MostrarErroresRegistro { get; set; } = false;
+    // public string? Errores { get; set; }
+
+    // async Task<RespuestaRegistro> Registrar(AppUserToRegisterDto usuarioRegistro)
+    // {
+    //     var resultado = await http.PostAsJsonAsync($"{Inicializar.UrlBaseApi}api/Account/Register", usuarioRegistro);
+    //     var contentTemp = await resultado.Content.ReadAsStringAsync();
+    //     var js = (JObject)JsonConvert.DeserializeObject(contentTemp)!;
+
+    //     var final = js["errorMessage"]!.ElementAt(0).ToString();
+    //     if (final == "Te has registrado con exito")
+    //     {
+
+    //         return new RespuestaRegistro { registroCorrecto = true, Errores = js["errorMessage"]!.ElementAt(0).ToString() };
+    //     }
+    //     else
+    //     {
+
+    //         return new RespuestaRegistro { registroCorrecto = false, Errores = js["errorMessage"]!.ElementAt(0).ToString() };
+    //     }
+    // }
+
+    // private async Task RegistrarUsuario()
+    // {
+    //     EstaProcesando = true;
+    //     var result = await Registrar(usuarioNewRegistro);
+    //     if (result.registroCorrecto)
+    //     {
+    //         MostrarErroresRegistro = false;
+    //         EstaProcesando = false;
+    //         navigationManager!.NavigateTo("/Acceder");
+    //         Errores = result.Errores;
+    //     }
+    //     else
+    //     {
+    //         EstaProcesando = false;
+    //         Errores = result.Errores;
+    //         //result.Errores;
+    //         MostrarErroresRegistro = true;
+    //     }
+    // }
+
+
+    //await response.Content.ReadAsStringAsync();
+    private UsuarioRegistro UsuarioParaRegistro = new UsuarioRegistro();
+    public bool EstaProcesando { get; set; } = false;
+    public bool MostrarErroresRegistro { get; set; } = false;
+    public bool FueExitoso { get; set; } = false;
+
+    public string? Errores { get; set; }
+
+    [Inject]
+    public IServicioAutenticacion? servicioAutenticacion { get; set; }
+
+    [Inject]
+    public NavigationManager? navigationManager { get; set; }
+
+    private async Task RegistrarUsuario()
+    {
+
+        EstaProcesando = true;
+        var result = await servicioAutenticacion!.RegistrarUsuario(UsuarioParaRegistro);
+        if (result.registroCorrecto)
+        {
+            MostrarErroresRegistro = false;
+            EstaProcesando = false;
+            navigationManager!.NavigateTo("/Acceder");
+            FueExitoso = true;
+            Errores = result.Errores;
+        }
+        else
+        {
+            EstaProcesando = false;
+            Errores = result.Errores;
+            //result.Errores;
+            MostrarErroresRegistro = true;
+        }
+    }
+
+    [CascadingParameter]
+    protected Task<AuthenticationState>? AuthState { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthState!).User;
+
+        if (user!.Identity!.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/", true);
+        }
+    }
+
+
+}
